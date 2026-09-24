@@ -1,4 +1,7 @@
+
 export default function App() {
+  
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-100 p-6">
       <div className="rounded-2xl bg-white p-8 shadow-xl max-w-sm text-center">
