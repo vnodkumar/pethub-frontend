@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { setAuthToken } from "../api/axiosInstance";
+import { useEffect, useState } from "react";
+import { setAuthToken,setLogoutHandler } from "../api/axiosInstance";
 import { AuthContext } from "./AuthContext";
 
 export default function AuthProvider({children}){
@@ -17,6 +17,13 @@ export default function AuthProvider({children}){
         setUser(null);
         setAuthToken(null);
     }
+
+    //set logout to module level variable to logout on first render,
+    // so that we can use that to logout user whenever token gets invalid
+    useEffect(()=>{
+        setLogoutHandler(logout);
+    },[])
+
     return (
         <AuthContext.Provider  value={{user,login,logout}}>
             {children}
