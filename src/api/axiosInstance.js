@@ -34,6 +34,7 @@ api.interceptors.response.use(
             if(logoutHandler)
                 logoutHandler();
         }
+        return Promise.reject(error)
     }
 );
 
