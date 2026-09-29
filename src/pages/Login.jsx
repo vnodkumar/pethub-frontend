@@ -1,11 +1,12 @@
 import { useState } from "react";
 import api from "../api/axiosInstance";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login(){
     const {login} = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [error, setError] = useState(null); 
     const [loading,setLoading] = useState(false);
@@ -31,8 +32,10 @@ export default function Login(){
             //login
             login(token,{email});
 
+            const redirectTo = location.state?.from?.pathname || "/"
+
             //redirect to home page
-            navigate("/home")
+            navigate(redirectTo)
 
             //clearForm
             setEmail("");
