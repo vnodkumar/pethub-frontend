@@ -50,83 +50,103 @@ export default function Register() {
   }
 
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="name">Name:</label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <br />
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
+      <div className="w-full max-w-2xl rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <label htmlFor="name" className="block text-sm font-medium text-slate-700">Name:</label>
+              <input
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                type="text"
+                name="name"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
 
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <br />
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700">Email:</label>
+              <input
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                type="email"
+                name="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          minLength="6"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <br />
+            <div className="space-y-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700">Password:</label>
+              <input
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                type="password"
+                name="password"
+                id="password"
+                minLength="6"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-        <label htmlFor="confirm">Confirm Password:</label>
-        <input
-          type="password"
-          name="confirmPass"
-          id="confirm"
-          value={confirmPass}
-          onChange={(e) => setConfirmPass(e.target.value)}
-          required
-        />
-        <br />
+            <div className="space-y-1.5">
+              <label htmlFor="confirm" className="block text-sm font-medium text-slate-700">Confirm Password:</label>
+              <input
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                type="password"
+                name="confirmPass"
+                id="confirm"
+                value={confirmPass}
+                onChange={(e) => setConfirmPass(e.target.value)}
+                required
+              />
+            </div>
 
-        <label htmlFor="phone">Phone:</label>
-        <input
-          type="text"
-          name="phone"
-          id="phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <br />
+            <div className="space-y-1.5">
+              <label htmlFor="phone" className="block text-sm font-medium text-slate-700">Phone:</label>
+              <input
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                type="text"
+                name="phone"
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
 
-        <label htmlFor="address">Address:</label>
-        <input
-          type="text"
-          name="address"
-          id="address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-        <br />
+            <div className="space-y-1.5">
+              <label htmlFor="address" className="block text-sm font-medium text-slate-700">Address:</label>
+              <input
+                className="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                type="text"
+                name="address"
+                id="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+          </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Registering..." : "Register"}
-        </button>
-      </form>
+          <button
+            className="w-full rounded-md bg-slate-900 px-4 py-2.5 font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Registering..." : "Register"}
+          </button>
+        </form>
 
-      {error && <div>{error}</div>}
+        {error && <div className="mt-4 text-sm font-medium text-red-600">{error}</div>}
 
-      <div>
-        Already have an account? <Link to="/login">Login</Link>
+        <div className="mt-6 text-center text-sm text-slate-600">
+          Already have an account? <Link className="font-medium text-slate-900 underline underline-offset-4 hover:text-slate-600" to="/login">Login</Link>
+        </div>
       </div>
-    </>
+    </main>
   );
 }
