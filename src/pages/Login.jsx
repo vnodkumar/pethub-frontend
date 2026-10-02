@@ -35,7 +35,7 @@ export default function Login(){
             const redirectTo = location.state?.from?.pathname || "/"
 
             //redirect to home page
-            navigate(redirectTo)
+            navigate(redirectTo,{replace:true})
 
             //clearForm
             setEmail("");
