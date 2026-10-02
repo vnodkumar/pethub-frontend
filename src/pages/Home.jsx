@@ -10,6 +10,8 @@ export default function Home(){
             <h3>{user?.email}</h3>
             <Link to="/cart">view cart</Link>
             <br />
+            <Link to="/orders">view orders</Link>
+            <br />
             <Link to="/products">view Products</Link>
         </div>
     )
