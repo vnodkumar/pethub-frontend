@@ -7,6 +7,7 @@ export default function Order() {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [canceling, setCanceling] = useState(false);
 
     useEffect(() => {
         async function getOrder() {
@@ -29,6 +30,26 @@ export default function Order() {
         getOrder();
     }, [id]);
 
+    const handleCancelOrder = async () => {
+        try {
+            console.log("Cancelling...")
+            setCanceling(true);
+            setError(null);
+            
+            await api.put(`/api/v1/orders/${order.id}/cancel`);
+            
+            setOrder((currentOrder) => ({
+                ...currentOrder,
+                orderStatus: "CANCELLED",
+            }));
+            
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to cancel order. Please try again.");
+        } finally {
+            setCanceling(false);
+        }
+    };
+
     return (
         <main className="mx-auto min-h-screen w-full max-w-4xl px-4 py-10 sm:px-6">
             <h1 className="mb-6 text-3xl font-bold tracking-tight text-slate-900">Order details</h1>
@@ -46,7 +67,7 @@ export default function Order() {
                         </div>
                         <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
                             <dt className="font-semibold text-slate-900">Order date</dt>
-                            <dd className="text-slate-600">{order.orderDate}</dd>
+                            <dd className="text-slate-600">{order.orderDate?.split("T")[0]}</dd>
                         </div>
                         <div className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr] sm:gap-4">
                             <dt className="font-semibold text-slate-900">Total</dt>
@@ -69,6 +90,17 @@ export default function Order() {
                             <dd className="text-slate-600">{order.paymentStatus}</dd>
                         </div>
                     </dl>
+
+                    {String(order.orderStatus).toLowerCase() === "confirmed" && (
+                        <button
+                            type="button"
+                            onClick={handleCancelOrder}
+                            disabled={canceling}
+                            className="inline-flex items-center justify-center rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                            {canceling ? "Cancelling..." : "Cancel order"}
+                        </button>
+                    )}
 
                     <section aria-labelledby="order-items-heading" className="space-y-4">
                         <h2 id="order-items-heading" className="text-xl font-semibold text-slate-900">

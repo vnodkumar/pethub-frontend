@@ -40,7 +40,7 @@ export default function OrderHistory() {
                             <dl className="grid flex-1 gap-x-8 gap-y-2 text-sm sm:grid-cols-3">
                                 <div>
                                     <dt className="font-semibold text-slate-900">Date</dt>
-                                    <dd className="text-slate-600">{order.date}</dd>
+                                    <dd className="text-slate-600">{order.date?.split("T")[0]}</dd>
                                 </div>
                                 <div>
                                     <dt className="font-semibold text-slate-900">Status</dt>
