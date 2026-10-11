@@ -7,7 +7,6 @@ export default function ProductCard({product}){
             <Link className="block" to={`/products/${product.id}`}>
                 <img className="mb-4 h-44 w-full rounded-md object-cover" src={product.imagePath} alt={product.name} />
                 <div className="space-y-2 text-sm text-slate-600" >
-                    <p><span className="font-semibold text-slate-900">Id:</span> {product.id}</p>
                     <p><span className="font-semibold text-slate-900">Name:</span> {product.name}</p>
                     <p><span className="font-semibold text-slate-900">Category:</span> {product.category}</p>
                     <p className="pt-2 text-base font-semibold text-slate-900">Price: ${product.price}</p>

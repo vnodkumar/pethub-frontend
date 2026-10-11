@@ -11,6 +11,7 @@ import Checkout from "./pages/Checkout";
 import Order from "./pages/Order";
 import OrderHistory from "./pages/OrderHistory";
 import { useAuth } from "./context/AuthContext";
+import Layout from "./components/Layout";
 
 function CheckoutRoute() {
   const location = useLocation();
@@ -31,16 +32,18 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home/>} />
-          <Route path="/register" element={<Register/>}/>
-          <Route path="/login" element={<GuestRoute />}/>
-          <Route path="/products" element={<Product/>}/>
-          <Route path="/products/:id" element={<ProductDetails/>} />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/cart" element={<Cart/>}/>
-            <Route path="/checkout" element={<CheckoutRoute/>}/>
-            <Route path="/orders" element={<OrderHistory/>}/>
-            <Route path="/orders/:id" element={<Order/>}/>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home/>} />
+            <Route path="/register" element={<Register/>}/>
+            <Route path="/login" element={<GuestRoute />}/>
+            <Route path="/products" element={<Product/>}/>
+            <Route path="/products/:id" element={<ProductDetails/>} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/cart" element={<Cart/>}/>
+              <Route path="/checkout" element={<CheckoutRoute/>}/>
+              <Route path="/orders" element={<OrderHistory/>}/>
+              <Route path="/orders/:id" element={<Order/>}/>
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

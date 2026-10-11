@@ -26,7 +26,7 @@ export default function Cart() {
     },[])
 
     return(
-        <main className="mx-auto max-w-4xl px-6 py-10">
+        <main className="mx-auto flex-1 max-w-4xl px-6 py-10">
             <h1 className="mb-6 text-3xl font-bold text-slate-900">Your Cart</h1>
             {loading ? (
                 <p className="text-slate-600">Loading cart...</p>

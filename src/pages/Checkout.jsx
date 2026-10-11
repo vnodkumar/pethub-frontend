@@ -40,7 +40,6 @@ export default function Checkout() {
                 deliveryAddress,
                 contactPhone,
             });
-            console.log(response.data)
             navigate(`/orders/${response.data}`,{replace:true});
         } catch (err) {
             const responseData = err.response?.data;
@@ -63,7 +62,7 @@ export default function Checkout() {
     );
 
     return (
-        <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-8 px-4 py-10 sm:px-6">
+        <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col gap-8 px-4 py-10 sm:px-6">
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">Checkout</h1>
 
             <section aria-labelledby="order-summary-heading" className="space-y-4">

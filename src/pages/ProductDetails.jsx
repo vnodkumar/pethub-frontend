@@ -37,11 +37,9 @@ export default function ProductDetails(){
             try{
                 setLoading(true);
                 const response = await api.get(`/api/v1/products/${id}`);
-                console.log(response.data)
                 setProduct(response.data)
             }
             catch(err){
-                console.log(err.response?.data?.message);
                 setError(err.response?.data?.message || "Failed to load products");
             }
             finally{
@@ -54,7 +52,7 @@ export default function ProductDetails(){
 
 
     return(
-        <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6">
+        <main className="flex-1 bg-slate-50 px-4 py-10 sm:px-6">
             <section className="mx-auto w-full max-w-2xl rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                 <div className="mb-6 flex items-center justify-between border-b border-slate-200 pb-4">
                     <h1 className="text-2xl font-bold tracking-tight text-slate-900">Product details</h1>

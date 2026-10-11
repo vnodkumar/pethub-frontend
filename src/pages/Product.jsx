@@ -27,7 +27,7 @@ export default function Product(){
     },[])
 
     return(
-        <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
+        <main className="mx-auto flex flex-1 w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">Product page</h1>
 
             <div className="space-y-2">
