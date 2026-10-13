@@ -11,9 +11,6 @@ export default function Navbar() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    // TODO: adjust to your user shape
-    const uname = user?.uname ?? user?.name ?? user?.email;
-
     function handleLogout(e) {
         e.preventDefault();
         logout();
@@ -43,7 +40,6 @@ export default function Navbar() {
 
 
                             <li><Link className={linkClass} to="/orders">Order History</Link></li>
-
                             <li><a className={linkClass} href="/" onClick={handleLogout}>Logout</a></li>
                         </>
                     ) : (
@@ -62,10 +58,20 @@ export default function Navbar() {
                     <Link to="/search"><i className={`fa-solid fa-magnifying-glass ${iconClass}`}></i></Link>
                     <Link to="/cart"><i className={`fa-solid fa-cart-shopping ${iconClass}`}></i></Link>
 
-                    <div className="flex items-center p-2.5 text-base text-gray-800">
-                        <i className="fa fa-user-circle mr-1 text-2xl"></i>
-                        {uname}
-                    </div>
+                    <Link
+                        to="/profile"
+                        className="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-800 shadow-sm transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                        aria-label="Profile"
+                        title="Profile"
+                    >
+                        <svg
+                            className="size-[1.625rem] fill-current"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.42 0-8 2.24-8 5v3h16v-3c0-2.76-3.58-5-8-5Z" />
+                        </svg>
+                    </Link>
                 </div>
             )}
         </header>

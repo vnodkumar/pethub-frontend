@@ -55,7 +55,7 @@ export default function Login(){
     return(
         <main className="flex flex-1 items-center justify-center bg-[rgb(222, 217, 122)] px-4 py-8 font-[Arial,sans-serif]">
             <div className="flex min-h-[500px] w-full max-w-[800px] flex-col overflow-hidden rounded-xl bg-red-600 shadow-[0_8px_16px_rgba(0,0,0,0.2)] transition-shadow duration-300 hover:shadow-[0_12px_24px_rgba(0,0,0,0.3)] md:h-[500px] md:flex-row">
-                <div className="flex min-h-[240px] flex-1 items-center justify-center bg-[#f1f4f8] md:min-h-0">
+                <div className="flex min-h-[240px] flex-1 items-center justify-center overflow-hidden bg-[#f1f4f8] md:min-h-0">
                     <img
                         className="h-full w-full object-cover"
                         src={loginImage}

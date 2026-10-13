@@ -10,6 +10,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Checkout from "./pages/Checkout";
 import Order from "./pages/Order";
 import OrderHistory from "./pages/OrderHistory";
+import Profile from "./pages/Profile";
 import { useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
 
@@ -43,6 +44,7 @@ export default function App() {
               <Route path="/checkout" element={<CheckoutRoute/>}/>
               <Route path="/orders" element={<OrderHistory/>}/>
               <Route path="/orders/:id" element={<Order/>}/>
+              <Route path="/profile" element={<Profile/>}/>
             </Route>
           </Route>
         </Routes>
