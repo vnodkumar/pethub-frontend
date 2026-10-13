@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axiosInstance";
 
@@ -7,21 +7,27 @@ export default function OrderHistory() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        async function getOrders() {
-            try {
-                setLoading(true);
-                const response = await api.get("/api/v1/orders");
-                setOrders(response.data);
-            } catch {
-                setError("Failed to load order history. Please try again.");
-            } finally {
-                setLoading(false);
-            }
+    const getOrders = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await api.get("/api/v1/orders");
+            setOrders(response.data ?? []);
+        } catch (err) {
+            const message =
+                err?.response?.data?.message ||
+                (err?.code === "ERR_NETWORK"
+                    ? "Unable to reach the order service. Please check your connection and try again."
+                    : "Failed to load order history. Please try again.");
+            setError(message);
+        } finally {
+            setLoading(false);
         }
-
-        getOrders();
     }, []);
+
+    useEffect(() => {
+        getOrders();
+    }, [getOrders]);
 
     return (
         <main className="mx-auto flex-1 w-full max-w-4xl px-4 py-10 sm:px-6">
@@ -30,7 +36,17 @@ export default function OrderHistory() {
             {loading ? (
                 <p className="text-sm text-slate-500">Loading orders...</p>
             ) : error ? (
-                <p className="text-sm font-medium text-red-700" role="alert">{error}</p>
+                <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
+                    <p className="font-medium">We couldn’t load your order history.</p>
+                    <p className="mt-1">{error}</p>
+                    <button
+                        type="button"
+                        onClick={getOrders}
+                        className="mt-3 rounded border border-red-300 bg-white px-3 py-1.5 font-medium text-red-700 transition hover:bg-red-100"
+                    >
+                        Try again
+                    </button>
+                </div>
             ) : orders.length === 0 ? (
                 <p className="text-sm text-slate-600">You have no orders yet.</p>
             ) : (

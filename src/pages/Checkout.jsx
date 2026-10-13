@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axiosInstance";
 
@@ -13,21 +13,31 @@ export default function Checkout() {
     const [submitError, setSubmitError] = useState(null);
     const [issues, setIssues] = useState(null);
 
-    useEffect(() => {
-        async function getCart() {
-            try {
-                setLoading(true);
-                const response = await api.get("/api/v1/cart");
-                setCartItems(response.data);
-            } catch (err) {
-                setError(err.response?.data?.message || "Failed to get cart");
-            } finally {
-                setLoading(false);
-            }
-        }
+    const getCart = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await api.get("/api/v1/cart");
+            setCartItems(response.data ?? []);
+        } catch (err) {
+            const message =
+                err?.response?.data?.message ||
+                (err?.code === "ERR_NETWORK"
+                    ? "Unable to reach the cart service. Please check your connection and try again."
+                    : err?.response?.status === 500
+                        ? "Something went wrong while loading your cart. Please try again."
+                        : "Unable to load your cart right now. Please try again.");
 
-        getCart();
+            setCartItems([]);
+            setError(message);
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        getCart();
+    }, [getCart]);
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -40,14 +50,14 @@ export default function Checkout() {
                 deliveryAddress,
                 contactPhone,
             });
-            navigate(`/orders/${response.data}`,{replace:true});
+            navigate(`/orders/${response.data}`, { replace: true });
         } catch (err) {
             const responseData = err.response?.data;
             if (err.response?.status === 400 && Array.isArray(responseData?.issues)) {
                 setSubmitError(responseData.message || "Some items in your cart need attention.");
                 setIssues(responseData.issues);
             } else if (err.response?.status === 400) {
-                setSubmitError(responseData?.message || "Failed to place order");
+                setSubmitError(responseData?.message || "Failed to place order.");
             } else {
                 setSubmitError("Failed to place order. Please try again.");
             }
@@ -62,7 +72,7 @@ export default function Checkout() {
     );
 
     return (
-        <main className="mx-auto flex flex-1 w-full max-w-4xl flex-col gap-8 px-4 py-10 sm:px-6">
+        <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6">
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">Checkout</h1>
 
             <section aria-labelledby="order-summary-heading" className="space-y-4">
@@ -72,7 +82,17 @@ export default function Checkout() {
                 {loading ? (
                     <p className="text-sm text-slate-500">Loading cart...</p>
                 ) : error ? (
-                    <p className="text-sm font-medium text-red-700" role="alert">{error}</p>
+                    <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
+                        <p className="font-medium">We couldn’t load your cart.</p>
+                        <p className="mt-1">{error}</p>
+                        <button
+                            type="button"
+                            onClick={getCart}
+                            className="mt-3 rounded border border-red-300 bg-white px-3 py-1.5 font-medium text-red-700 transition hover:bg-red-100"
+                        >
+                            Try again
+                        </button>
+                    </div>
                 ) : (
                     <>
                         {cartItems.length === 0 ? (

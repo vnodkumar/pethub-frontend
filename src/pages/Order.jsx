@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../api/axiosInstance";
 
@@ -9,39 +9,42 @@ export default function Order() {
     const [error, setError] = useState(null);
     const [canceling, setCanceling] = useState(false);
 
-    useEffect(() => {
-        async function getOrder() {
-            try {
-                setLoading(true);
-                setError(null);
-                const response = await api.get(`/api/v1/orders/${id}`);
-                setOrder(response.data);
-            } catch (err) {
-                if (err.response?.status === 404) {
-                    setError(err.response.data?.message || "Order not found");
-                } else {
-                    setError("Failed to load order. Please try again.");
-                }
-            } finally {
-                setLoading(false);
+    const getOrder = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await api.get(`/api/v1/orders/${id}`);
+            setOrder(response.data);
+        } catch (err) {
+            if (err.response?.status === 404) {
+                setError(err.response.data?.message || "We couldn’t find this order.");
+            } else {
+                const message =
+                    err?.code === "ERR_NETWORK"
+                        ? "Unable to reach the order service. Please check your connection and try again."
+                        : "Failed to load order details. Please try again.";
+                setError(message);
             }
+        } finally {
+            setLoading(false);
         }
-
-        getOrder();
     }, [id]);
+
+    useEffect(() => {
+        getOrder();
+    }, [getOrder]);
 
     const handleCancelOrder = async () => {
         try {
             setCanceling(true);
             setError(null);
-            
+
             await api.put(`/api/v1/orders/${order.id}/cancel`);
-            
+
             setOrder((currentOrder) => ({
                 ...currentOrder,
                 orderStatus: "CANCELLED",
             }));
-            
         } catch (err) {
             setError(err.response?.data?.message || "Failed to cancel order. Please try again.");
         } finally {
@@ -56,7 +59,17 @@ export default function Order() {
             {loading ? (
                 <p className="text-sm text-slate-500">Loading order...</p>
             ) : error ? (
-                <p className="text-sm font-medium text-red-700" role="alert">{error}</p>
+                <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert">
+                    <p className="font-medium">We couldn’t load this order.</p>
+                    <p className="mt-1">{error}</p>
+                    <button
+                        type="button"
+                        onClick={getOrder}
+                        className="mt-3 rounded border border-red-300 bg-white px-3 py-1.5 font-medium text-red-700 transition hover:bg-red-100"
+                    >
+                        Try again
+                    </button>
+                </div>
             ) : order && (
                 <div className="space-y-8">
                     <dl className="divide-y divide-slate-200 border-y border-slate-200 text-sm">
