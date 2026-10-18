@@ -135,9 +135,6 @@ export default function Order() {
                                             <p className="text-sm text-slate-600">Quantity: {item.quantity}</p>
                                         </div>
                                     </Link>
-                                    <p className="shrink-0 font-semibold text-slate-900">
-                                        ${Number(item.price).toFixed(2)}
-                                    </p>
                                 </li>
                             ))}
                         </ul>
