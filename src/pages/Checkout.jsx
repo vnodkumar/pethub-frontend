@@ -101,11 +101,18 @@ export default function Checkout() {
                             <ul className="divide-y divide-slate-200 border-y border-slate-200">
                                 {cartItems.map((item) => (
                                     <li key={item.id} className="flex items-center justify-between gap-4 py-4">
-                                        <div>
-                                            <p className="font-medium text-slate-900">{item.productName}</p>
-                                            <p className="text-sm text-slate-600">
-                                                Quantity: {item.quantity} | ${Number(item.price).toFixed(2)} each
-                                            </p>
+                                        <div className="flex min-w-0 items-center gap-4">
+                                            <img
+                                                className="size-20 shrink-0 rounded-md object-cover"
+                                                src={item.imagePath}
+                                                alt={item.productName}
+                                            />
+                                            <div className="min-w-0">
+                                                <p className="font-medium text-slate-900">{item.productName}</p>
+                                                <p className="text-sm text-slate-600">
+                                                    Quantity: {item.quantity} | ${Number(item.price).toFixed(2)} each
+                                                </p>
+                                            </div>
                                         </div>
                                         <p className="shrink-0 font-semibold text-slate-900">
                                             ${(Number(item.price) * Number(item.quantity)).toFixed(2)}

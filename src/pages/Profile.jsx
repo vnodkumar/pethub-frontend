@@ -70,7 +70,9 @@ export default function Profile() {
                     </div>
                     <div className="grid gap-1 py-4 sm:grid-cols-[10rem_1fr] sm:gap-4">
                         <dt className="font-semibold text-slate-900">Member since</dt>
-                        <dd className="text-slate-600">{profile.createdAt}</dd>
+                        <dd className="text-slate-600">
+                            {new Date(profile.createdAt).toLocaleDateString()}
+                        </dd>
                     </div>
                 </dl>
             )}
