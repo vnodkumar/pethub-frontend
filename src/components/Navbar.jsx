@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 import logo from "../images/Logo.png";
 
 const linkClass =
@@ -9,6 +10,7 @@ const iconClass = "text-2xl text-gray-800";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
+    const { cartCount } = useCart();
     const navigate = useNavigate();
 
     function handleLogout(e) {
@@ -36,7 +38,11 @@ export default function Navbar() {
                     {user ? (
                         <>
                             <li><Link className={linkClass} to="/products">Products</Link></li>
-                            <li><Link className={linkClass} to="/cart">Cart</Link></li>
+                            <li>
+                                <Link className={linkClass} to="/cart">
+                                    Cart{cartCount > 0 ? ` (${cartCount})` : ""}
+                                </Link>
+                            </li>
 
 
                             <li><Link className={linkClass} to="/orders">Order History</Link></li>

@@ -1,41 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import api from "../api/axiosInstance";
 import CartItem from "../components/CartItem";
+import { useCart } from "../context/CartContext";
 
 export default function Cart() {
-    const [cartItems, setCartItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const {
+        cartItems,
+        loading,
+        error,
+        updateQuantity: updateCartQuantity,
+        removeItem,
+        refreshCart,
+    } = useCart();
     const [updatingItems, setUpdatingItems] = useState({});
+    const [removingItems, setRemovingItems] = useState({});
     const [quantityErrors, setQuantityErrors] = useState({});
+    const [removeErrors, setRemoveErrors] = useState({});
     const updatingItemIds = useRef(new Set());
-
-    const getCart = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const response = await api.get("/api/v1/cart");
-            setCartItems(response.data ?? []);
-        } catch (err) {
-            const message =
-                err?.response?.data?.message ||
-                (err?.code === "ERR_NETWORK"
-                    ? "Unable to reach the cart service. Please check your connection and try again."
-                    : err?.response?.status === 500
-                        ? "Something went wrong while loading your cart. Please try again."
-                        : "Unable to load your cart right now. Please try again.");
-
-            setCartItems([]);
-            setError(message);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        getCart();
-    }, [getCart]);
+    const removingItemIds = useRef(new Set());
 
     async function updateQuantity(itemId, newQuantity) {
         if (!Number.isInteger(newQuantity) || newQuantity < 1 || updatingItemIds.current.has(itemId)) {
@@ -46,25 +28,7 @@ export default function Cart() {
         setUpdatingItems((items) => ({ ...items, [itemId]: true }));
 
         try {
-            const response = await api.put(`/api/v1/cart/${itemId}`, { quantity: newQuantity });
-            const responseItem = response.data?.item ?? response.data?.cartItem ?? response.data;
-            const hasUpdatedItem =
-                responseItem &&
-                typeof responseItem === "object" &&
-                !Array.isArray(responseItem) &&
-                String(responseItem.id) === String(itemId) &&
-                Number.isInteger(Number(responseItem.quantity)) &&
-                Number(responseItem.quantity) >= 1;
-
-            setCartItems((items) =>
-                items.map((item) =>
-                    item.id === itemId
-                        ? hasUpdatedItem
-                            ? { ...item, ...responseItem }
-                            : { ...item, quantity: newQuantity }
-                        : item,
-                ),
-            );
+            await updateCartQuantity(itemId, newQuantity);
             setQuantityErrors((errors) => {
                 const nextErrors = { ...errors };
                 delete nextErrors[itemId];
@@ -85,11 +49,41 @@ export default function Cart() {
         }
     }
 
+    async function handleRemove(itemId) {
+        if (removingItemIds.current.has(itemId) || updatingItemIds.current.has(itemId)) {
+            return;
+        }
+
+        removingItemIds.current.add(itemId);
+        setRemovingItems((items) => ({ ...items, [itemId]: true }));
+        setRemoveErrors((errors) => {
+            const nextErrors = { ...errors };
+            delete nextErrors[itemId];
+            return nextErrors;
+        });
+
+        try {
+            await removeItem(itemId);
+        } catch (err) {
+            setRemoveErrors((errors) => ({
+                ...errors,
+                [itemId]: err?.response?.data?.message || "Failed to remove item from cart",
+            }));
+        } finally {
+            removingItemIds.current.delete(itemId);
+            setRemovingItems((items) => {
+                const nextItems = { ...items };
+                delete nextItems[itemId];
+                return nextItems;
+            });
+        }
+    }
+
     const total = cartItems.reduce(
         (sum, item) => sum + Number(item.price) * Number(item.quantity),
         0,
     );
-
+    console.log("Cart items:", cartItems);
     return (
         <main className="mx-auto flex-1 max-w-4xl px-6 py-10">
             <h1 className="mb-6 text-3xl font-bold text-slate-900">Your Cart</h1>
@@ -101,7 +95,7 @@ export default function Cart() {
                     <p className="mt-1">{error}</p>
                     <button
                         type="button"
-                        onClick={getCart}
+                        onClick={refreshCart}
                         className="mt-3 rounded border border-red-300 bg-white px-3 py-1.5 font-medium text-red-700 transition hover:bg-red-100"
                     >
                         Try again
@@ -115,10 +109,12 @@ export default function Cart() {
                         <li key={item.id} className="py-4">
                             <CartItem
                                 item={item}
-                                onRemove={(id) => setCartItems((items) => items.filter((cartItem) => cartItem.id !== id))}
+                                onRemove={handleRemove}
                                 onQuantityChange={updateQuantity}
-                                updating={Boolean(updatingItems[item.id])}
+                                updating={Boolean(updatingItems[item.id] || removingItems[item.id])}
+                                removing={Boolean(removingItems[item.id])}
                                 quantityError={quantityErrors[item.id]}
+                                removeError={removeErrors[item.id]}
                             />
                         </li>
                     ))}

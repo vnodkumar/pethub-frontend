@@ -1,24 +1,14 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import api from "../api/axiosInstance";
 
-export default function CartItem({ item, onRemove, onQuantityChange, updating, quantityError }) {
-    const [removing, setRemoving] = useState(false);
-    const [error, setError] = useState(null);
-
-    async function removeFromCart() {
-        try {
-            setRemoving(true);
-            setError(null);
-            await api.delete(`/api/v1/cart/${item.id}`);
-            onRemove(item.id);
-        } catch (error) {
-            setError(error.response?.data?.message || "Failed to remove item from cart");
-        } finally {
-            setRemoving(false);
-        }
-    }
-
+export default function CartItem({
+    item,
+    onRemove,
+    onQuantityChange,
+    updating,
+    removing,
+    quantityError,
+    removeError,
+}) {
     return (
         <article>
             <div className="flex flex-wrap items-center gap-4">
@@ -64,14 +54,14 @@ export default function CartItem({ item, onRemove, onQuantityChange, updating, q
                 <button
                     className="rounded border border-red-300 px-3 py-2 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
                     type="button"
-                    onClick={removeFromCart}
+                    onClick={() => onRemove(item.id)}
                     disabled={removing || updating}
                 >
                     {removing ? "Removing..." : "Remove"}
                 </button>
             </div>
             {quantityError && <p className="mt-2 text-sm text-red-700" role="alert">{quantityError}</p>}
-            {error && <p className="mt-2 text-sm text-red-700" role="alert">{error}</p>}
+            {removeError && <p className="mt-2 text-sm text-red-700" role="alert">{removeError}</p>}
         </article>
     );
 }

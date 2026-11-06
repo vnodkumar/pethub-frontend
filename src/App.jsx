@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import { useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import SlowServerProvider from "./context/SlowServerProvider";
+import CartProvider from "./context/CartProvider";
 
 function CheckoutRoute() {
   const location = useLocation();
@@ -32,26 +33,28 @@ function GuestRoute(){
 export default function App() {
   return (
     <AuthProvider>
-      <SlowServerProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Home/>} />
-              <Route path="/register" element={<Register/>}/>
-              <Route path="/login" element={<GuestRoute />}/>
-              <Route path="/products" element={<Product/>}/>
-              <Route path="/products/:id" element={<ProductDetails/>} />
-              <Route element={<ProtectedRoute />}>
-                <Route path="/cart" element={<Cart/>}/>
-                <Route path="/checkout" element={<CheckoutRoute/>}/>
-                <Route path="/orders" element={<OrderHistory/>}/>
-                <Route path="/orders/:id" element={<Order/>}/>
-                <Route path="/profile" element={<Profile/>}/>
+      <CartProvider>
+        <SlowServerProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route element={<Layout />}>
+                <Route path="/" element={<Home/>} />
+                <Route path="/register" element={<Register/>}/>
+                <Route path="/login" element={<GuestRoute />}/>
+                <Route path="/products" element={<Product/>}/>
+                <Route path="/products/:id" element={<ProductDetails/>} />
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/cart" element={<Cart/>}/>
+                  <Route path="/checkout" element={<CheckoutRoute/>}/>
+                  <Route path="/orders" element={<OrderHistory/>}/>
+                  <Route path="/orders/:id" element={<Order/>}/>
+                  <Route path="/profile" element={<Profile/>}/>
+                </Route>
               </Route>
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </SlowServerProvider>
+            </Routes>
+          </BrowserRouter>
+        </SlowServerProvider>
+      </CartProvider>
     </AuthProvider>
   )
 }

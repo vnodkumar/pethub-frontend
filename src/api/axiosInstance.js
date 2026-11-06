@@ -48,7 +48,7 @@ export const getApiErrorMessage = (error, fallback) => {
 
 //axios instance
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL1,
     timeout: 90000,
     headers:{
         'Content-Type': 'application/json',

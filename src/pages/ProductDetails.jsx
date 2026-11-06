@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
 import api from "../api/axiosInstance";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 
 export default function ProductDetails() {
     const location = useLocation();
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { addToCart: addCartItem, isInCart, loading: cartLoading } = useCart();
     const { id } = useParams();
     const [product, setProduct] = useState({});
     const [quantity, setQuantity] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [addError, setAddError] = useState(null);
+    const [adding, setAdding] = useState(false);
 
     const getProduct = useCallback(async () => {
         try {
@@ -43,13 +47,14 @@ export default function ProductDetails() {
             return;
         }
 
-        const cartItem = { productId: product.id, quantity };
-
         try {
-            await api.post("/api/v1/cart", cartItem);
-            alert("Item added to cart. Check cart");
+            setAdding(true);
+            setAddError(null);
+            await addCartItem(product.id, quantity);
         } catch (err) {
-            setError(err.response?.data?.message || "Unable to add item to cart. Please try again.");
+            setAddError(err.response?.data?.message || "Unable to add item to cart. Please try again.");
+        } finally {
+            setAdding(false);
         }
     }
 
@@ -113,26 +118,29 @@ export default function ProductDetails() {
                             </div>
                         </dl>
                         <div className="mt-6 flex items-center gap-3">
-                            <label className="flex items-center gap-2 text-sm text-slate-700">
-                                Quantity
-                                <select
-                                    className="rounded border border-slate-300 bg-white px-2 py-2"
-                                    value={quantity}
-                                    onChange={(event) => setQuantity(Number(event.target.value))}
+
+                            {user && !cartLoading && isInCart(product.id) ? (
+                                <>
+    
+                                <Link
+                                    className="rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-700"
+                                    to="/cart"
                                 >
-                                    {[1, 2, 3, 4, 5].map((option) => (
-                                        <option key={option} value={option}>{option}</option>
-                                    ))}
-                                </select>
-                            </label>
-                            <button
-                                className="rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-700"
-                                type="button"
-                                onClick={addToCart}
-                            >
-                                Add to cart
-                            </button>
+                                    Go to Cart
+                                </Link>
+                                </>
+                            ) : (
+                                <button
+                                    className="rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                    type="button"
+                                    onClick={addToCart}
+                                    disabled={cartLoading || adding}
+                                >
+                                    {cartLoading ? "Loading cart..." : adding ? "Adding..." : "Add to Cart"}
+                                </button>
+                            )}
                         </div>
+                        {addError && <p className="mt-3 text-sm text-red-700" role="alert">{addError}</p>}
                     </>
                 )}
             </section>

@@ -1,43 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axiosInstance";
+import { useCart } from "../context/CartContext";
 
 export default function Checkout() {
     const navigate = useNavigate();
-    const [cartItems, setCartItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { cartItems, loading, error, refreshCart, clearCart } = useCart();
     const [deliveryAddress, setDeliveryAddress] = useState("");
     const [contactPhone, setContactPhone] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
     const [issues, setIssues] = useState(null);
-
-    const getCart = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const response = await api.get("/api/v1/cart");
-            setCartItems(response.data ?? []);
-        } catch (err) {
-            const message =
-                err?.response?.data?.message ||
-                (err?.code === "ERR_NETWORK"
-                    ? "Unable to reach the cart service. Please check your connection and try again."
-                    : err?.response?.status === 500
-                        ? "Something went wrong while loading your cart. Please try again."
-                        : "Unable to load your cart right now. Please try again.");
-
-            setCartItems([]);
-            setError(message);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        getCart();
-    }, [getCart]);
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -50,6 +23,7 @@ export default function Checkout() {
                 deliveryAddress,
                 contactPhone,
             });
+            clearCart();
             navigate(`/orders/${response.data}`, { replace: true });
         } catch (err) {
             const responseData = err.response?.data;
@@ -87,7 +61,7 @@ export default function Checkout() {
                         <p className="mt-1">{error}</p>
                         <button
                             type="button"
-                            onClick={getCart}
+                            onClick={refreshCart}
                             className="mt-3 rounded border border-red-300 bg-white px-3 py-1.5 font-medium text-red-700 transition hover:bg-red-100"
                         >
                             Try again
