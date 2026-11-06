@@ -5,7 +5,7 @@ export default function SlowServerBanner({ visible }) {
 
     return (
         <div
-            className="fixed inset-x-0 top-0 z-50 bg-amber-100 px-4 py-3 text-center text-sm font-medium text-amber-950 shadow-md"
+            className="fixed inset-x-0 top-0 z-50 bg-amber-100/80 px-4 py-3 text-center text-sm font-medium text-amber-950 shadow-md"
             role="status"
             aria-live="polite"
         >

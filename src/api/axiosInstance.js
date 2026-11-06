@@ -11,6 +11,7 @@ let slowHandler = null;
 let pendingRequests = 0;
 let slowTimer = null;
 let slowShown = false;
+const pendingConfigs = new WeakSet();
 
 export const setSlowHandler = (handler) => {
     slowHandler = handler;
@@ -19,7 +20,12 @@ export const setSlowHandler = (handler) => {
     }
 };
 
-const finishRequest = () => {
+const finishRequest = (config) => {
+    if (!config || !pendingConfigs.has(config)) {
+        return;
+    }
+
+    pendingConfigs.delete(config);
     pendingRequests = Math.max(0, pendingRequests - 1);
     if (pendingRequests === 0) {
         if (slowTimer !== null) {
@@ -51,8 +57,9 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config)=>{
-        pendingRequests += 1;
         try {
+            pendingConfigs.add(config);
+            pendingRequests += 1;
         if(tokenStorage)
             config.headers.Authorization=`Bearer ${tokenStorage}`;
 
@@ -70,23 +77,23 @@ api.interceptors.request.use(
 
         return config;
         } catch (error) {
-            finishRequest();
+            finishRequest(config);
             return Promise.reject(error);
         }
     },
     (error) => {
-        finishRequest();
+        finishRequest(error.config);
         return Promise.reject(error);
     }
     )
 
 api.interceptors.response.use(
     (response)=>{
-        finishRequest();
+        finishRequest(response.config);
         return response;
     },
     (error)=>{
-        finishRequest();
+        finishRequest(error.config);
         if(error.response && error.response.status === 401){
             //Invalid token so logout user
             if(logoutHandler)
