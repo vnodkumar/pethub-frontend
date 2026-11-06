@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axiosInstance";
 import CartItem from "../components/CartItem";
@@ -7,6 +7,9 @@ export default function Cart() {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [updatingItems, setUpdatingItems] = useState({});
+    const [quantityErrors, setQuantityErrors] = useState({});
+    const updatingItemIds = useRef(new Set());
 
     const getCart = useCallback(async () => {
         try {
@@ -34,6 +37,59 @@ export default function Cart() {
         getCart();
     }, [getCart]);
 
+    async function updateQuantity(itemId, newQuantity) {
+        if (!Number.isInteger(newQuantity) || newQuantity < 1 || updatingItemIds.current.has(itemId)) {
+            return;
+        }
+
+        updatingItemIds.current.add(itemId);
+        setUpdatingItems((items) => ({ ...items, [itemId]: true }));
+
+        try {
+            const response = await api.put(`/api/v1/cart/${itemId}`, { quantity: newQuantity });
+            const responseItem = response.data?.item ?? response.data?.cartItem ?? response.data;
+            const hasUpdatedItem =
+                responseItem &&
+                typeof responseItem === "object" &&
+                !Array.isArray(responseItem) &&
+                String(responseItem.id) === String(itemId) &&
+                Number.isInteger(Number(responseItem.quantity)) &&
+                Number(responseItem.quantity) >= 1;
+
+            setCartItems((items) =>
+                items.map((item) =>
+                    item.id === itemId
+                        ? hasUpdatedItem
+                            ? { ...item, ...responseItem }
+                            : { ...item, quantity: newQuantity }
+                        : item,
+                ),
+            );
+            setQuantityErrors((errors) => {
+                const nextErrors = { ...errors };
+                delete nextErrors[itemId];
+                return nextErrors;
+            });
+        } catch (err) {
+            setQuantityErrors((errors) => ({
+                ...errors,
+                [itemId]: err?.response?.data?.message || "Unable to update quantity. Please try again.",
+            }));
+        } finally {
+            updatingItemIds.current.delete(itemId);
+            setUpdatingItems((items) => {
+                const nextItems = { ...items };
+                delete nextItems[itemId];
+                return nextItems;
+            });
+        }
+    }
+
+    const total = cartItems.reduce(
+        (sum, item) => sum + Number(item.price) * Number(item.quantity),
+        0,
+    );
+
     return (
         <main className="mx-auto flex-1 max-w-4xl px-6 py-10">
             <h1 className="mb-6 text-3xl font-bold text-slate-900">Your Cart</h1>
@@ -60,10 +116,18 @@ export default function Cart() {
                             <CartItem
                                 item={item}
                                 onRemove={(id) => setCartItems((items) => items.filter((cartItem) => cartItem.id !== id))}
+                                onQuantityChange={updateQuantity}
+                                updating={Boolean(updatingItems[item.id])}
+                                quantityError={quantityErrors[item.id]}
                             />
                         </li>
                     ))}
                 </ul>
+            )}
+            {!loading && !error && cartItems.length > 0 && (
+                <p className="mt-4 text-right text-lg font-semibold text-slate-900">
+                    Total: ${total.toFixed(2)}
+                </p>
             )}
             {!loading && !error && cartItems.length > 0 && (
                 <Link
