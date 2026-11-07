@@ -118,17 +118,25 @@ export default function ProductDetails() {
                             </div>
                         </dl>
                         <div className="mt-6 flex items-center gap-3">
-
+                            <label className="flex items-center gap-2 text-sm text-slate-700">
+                                Quantity
+                                <select
+                                    className="rounded border border-slate-300 bg-white px-2 py-2"
+                                    value={quantity}
+                                    onChange={(event) => setQuantity(Number(event.target.value))}
+                                >
+                                    {[1, 2, 3, 4, 5].map((option) => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
+                                </select>
+                            </label>
                             {user && !cartLoading && isInCart(product.id) ? (
-                                <>
-    
                                 <Link
                                     className="rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-700"
                                     to="/cart"
                                 >
                                     Go to Cart
                                 </Link>
-                                </>
                             ) : (
                                 <button
                                     className="rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
